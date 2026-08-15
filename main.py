@@ -38,6 +38,20 @@ def move_player():
     if player[pygame.K_RIGHT]:
         player.x += PLAYER_SPEED
 
+def world_to_screen(x, y, scale):
+    b_x = x - player_x
+    b_y = y - player_y
+    h_x = b_x * scale
+    h_y = b_y * scale
+    halfx = WIDTH // 2
+    halfy = HEIGHT // 2
+    screen_x = h_x + halfx
+    screen_y = h_y + halfy
+    return screen_x, screen_y
+
+
+
+
 
 #головний цикл гри
 running = True
