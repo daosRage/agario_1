@@ -27,6 +27,16 @@ player_color = (0, 255, 0)  # зелений
 
 
 
+def move_player():
+    player = pygame.key.get_pressed()
+    if player[pygame.K_UP]:
+        player.y -= PLAYER_SPEED
+    if player[pygame.K_DOWN]:
+        player.y += PLAYER_SPEED
+    if player[pygame.K_LEFT]:
+        player.x -= PLAYER_SPEED
+    if player[pygame.K_RIGHT]:
+        player.x += PLAYER_SPEED
 
 
 #головний цикл гри
