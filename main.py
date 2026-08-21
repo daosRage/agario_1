@@ -26,7 +26,18 @@ player_color = (0, 255, 0)  # зелений
 
 
 
-
+def eat_food():
+    
+    eaten = []
+    
+    for food in food_items:
+        if food.check_collision(player_x, player_y, player_radius):
+            eaten.append(food)         
+            player_radius += 1          
+            
+    for food in eaten:
+        food_items.remove(food)
+        
 def move_player():
     player = pygame.key.get_pressed()
     if player[pygame.K_UP]:
