@@ -104,3 +104,20 @@ def playeris_touching(self, other_x, other_y, other_radius):
     distance = hypot(distance_x, distance_y)
 
     return distance <= self.radius + other_radius
+
+
+class Food:
+    def __init__(self, x, y, radius, color):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+
+    def to_dict(self):
+
+        a = {"x": self.x,
+                "y": self.y,
+                "radius": self.radius,
+                "color": self.color}
+        
+        return a
