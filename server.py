@@ -1,6 +1,7 @@
 import json 
 import socket
-def handle_client(conn, addr, player): global state_lock, players
+def handle_client(conn, addr, player): 
+    global state_lock, players
     buffer = ""
     conn.settimeout(30)
 
