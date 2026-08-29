@@ -1,5 +1,17 @@
 import json 
 import socket
+
+class Player():
+    def __init__(self,player_id,x,y,color,socket):
+        self.player_id = player_id
+        self.x = x
+        self.y =y
+        self.color = color
+        self.socket = socket
+        self.radius = START_PLAYER_RADIUS
+        self.name = f"{player_id}"
+        self.keys = {}
+
 def handle_client(conn, addr, player): 
     global state_lock, players
     buffer = ""
