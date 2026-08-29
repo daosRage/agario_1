@@ -22,6 +22,26 @@ player_radius = 20
 player_color = (0, 255, 0)  # зелений
 
 
+class Food:
+    def __init__(self, x, y, radius, color):
+
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+
+
+
+
+
+
+    def is_touching_player(self,  px, py, p_radius):
+
+        distance_x = self.x - px
+        distance_y = self.y - py
+        d = hypot(distance_x , distance_y)
+        
+        return d <= self.radius + p_radius
 
 
 
