@@ -103,6 +103,30 @@ while running:
             running = False
 
     keys = pygame.key.get_pressed()
+
+from pygame import*
+from random import*
+
+arta= food_items
+FOOD_COUNT = 1000
+
+def create_food_field():
+    food_list = []
+    
+    for _ in range(FOOD_COUNT):
+        x = randint(-WORLD_SIZE, WORLD_SIZE)
+        
+        y = randint(-WORLD_SIZE, WORLD_SIZE)
+        
+        color = (randint(0, 255), randint(0, 255), randint(0, 255))
+
+        new_food = Food(x, y, color)
+        
+   
+        food_list.append(new_food)
+        
+ 
+    return food_list    
     move_player(keys)
     eat_food()
     draw_everything()
