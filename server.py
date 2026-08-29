@@ -80,3 +80,11 @@ def extract_complete_messages(messages, buffer):
         messages.append(line)
         buffer = buffer[index+1:]
     return messages, buffer
+
+def playeris_touching(self, other_x, other_y, other_radius):
+
+    distance_x = self.x - self.orher_x
+    distance_y = self.y - self.orher_y
+    distance = hypot(distance_x, distance_y)
+
+    return distance <= self.radius + other_radius
