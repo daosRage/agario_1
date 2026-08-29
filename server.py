@@ -48,3 +48,23 @@ def send_json_line(sock, data):
         return True
     except OSError:
         return False        
+
+def to_dict():
+    player = []
+    player.append(self.player_id)
+    player.append(self.x)
+    player.append(self.y)
+    player.append(self.radius)
+    player.append(self.color)
+    player.append(self.name)
+    return player
+
+def extract_complete_messages(messages, buffer):
+    messages = []
+    index = buffer.find("/n")
+    while index > -1:
+        index = buffer.find("/n")
+        line = buffer[:index]
+        messages.append(line)
+        buffer = buffer[index+1:]
+    return messages, buffer
