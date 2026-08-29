@@ -71,7 +71,7 @@ def create_random_food():
     return f
 
 food_items = []
-for i in FOOD_COUNT:
+for i in range(FOOD_COUNT):
     food_items.append(create_random_food())
     
 def to_dict(self):
