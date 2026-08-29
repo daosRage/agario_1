@@ -40,3 +40,11 @@ def handle_client(conn, addr, player):
         conn.close()
         print(f"Player {player.id} disconnected")
         
+def send_json_line(sock, data):
+    try:
+        text = json.dumps(data)
+        message = text + "\n"
+        sock.sendall(message.encode("utf-8"))
+        return True
+    except OSError:
+        return False        
