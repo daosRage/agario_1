@@ -45,7 +45,18 @@ def calculate_camera_scale():
         a = threshold_radius / player_radius
         b = a ** zoom_out_speed
         return b  
+def calculate_food_scale():
+    comfortble_scale = 1.0
+    threshold_radius = 100
+    zoom_out_speed = 0.3
 
+    if player_radius <= threshold_radius:
+        return comfortble_scale
+
+    else:
+        a = threshold_radius / player_radius
+        b = a ** zoom_out_speed
+        return b  
     def is_touching_player(self,  px, py, p_radius):
 
         distance_x = self.x - px
