@@ -60,16 +60,32 @@ def send_json_line(sock, data):
         return True
     except OSError:
         return False        
+def create_random_food():
+    x = randint(-WORLD_SIZE, WORLD_SIZE)
+    y = randint(-WORLD_SIZE, WORLD_SIZE)
+    c1 = randint(0, 255)
+    c2 = randint(0, 255)
+    c3 = randint(0, 255)
+    color = (c1, c2, c3)
+    f = Food(x, y, FOOD_RADIUS, color)
+    return f
 
-def to_dict():
-    player = []
-    player.append(self.player_id)
-    player.append(self.x)
-    player.append(self.y)
-    player.append(self.radius)
-    player.append(self.color)
-    player.append(self.name)
+food_items = []
+for i in FOOD_COUNT:
+    food_items.append(create_random_food())
+    
+def to_dict(self):
+    player = {
+    "id": self.player_id,
+    "id": self.x,
+    "id": self.y,
+    "id": self.radius,
+    "id": self.color,
+    "id": self.name,
+    
+    }
     return player
+
 
 def extract_complete_messages(messages, buffer):
     messages = []
