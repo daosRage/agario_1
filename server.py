@@ -77,11 +77,11 @@ for i in range(FOOD_COUNT):
 def to_dict(self):
     player = {
     "id": self.player_id,
-    "id": self.x,
-    "id": self.y,
-    "id": self.radius,
-    "id": self.color,
-    "id": self.name,
+    "coordinates": self.x,
+    "coordinates": self.y,
+    "radius": self.radius,
+    "color": self.color,
+    "name": self.name,
     
     }
     return player
