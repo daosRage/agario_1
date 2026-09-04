@@ -1,5 +1,51 @@
-import json 
 import socket
+import threading
+import json
+from math import hypot
+from random import randint
+from time import sleep, time
+
+#Налаштування сервера 
+HOST = "localhost"       # слухати на всіх мережевих інтерфейсах
+PORT = 5555
+MAX_PLAYERS = 10        # більше десяти гравців одночасно сервер не пустить
+
+#Налаштування гри (світ такий самий, як і в клієнтському коді)
+WORLD_SIZE = 4000
+FOOD_COUNT = 1000
+FOOD_RADIUS = 10
+START_PLAYER_RADIUS = 20
+PLAYER_SPEED = 15
+TICK_RATE = 30           # скільки разів на секунду сервер рахує гру й шле оновлення
+EAT_SIZE_ADVANTAGE = 1.2  # наскільки більшим треба бути, щоб з'їсти іншого гравця
+
+
+class Food:
+    def __init__(self, x, y, radius, color):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+
+    def to_dict(self):
+
+        a = {"x": self.x,
+                "y": self.y,
+                "radius": self.radius,
+                "color": self.color}
+        
+        return a
+
+def create_random_food():
+    x = randint(-WORLD_SIZE, WORLD_SIZE)
+    y = randint(-WORLD_SIZE, WORLD_SIZE)
+    c1 = randint(0, 255)
+    c2 = randint(0, 255)
+    c3 = randint(0, 255)
+    color = (c1, c2, c3)
+    f = Food(x, y, FOOD_RADIUS, color)
+    return f
+
 
 class Player():
     def __init__(self,player_id,x,y,color,socket):
@@ -11,6 +57,18 @@ class Player():
         self.radius = START_PLAYER_RADIUS
         self.name = f"{player_id}"
         self.keys = {}
+
+
+# ==== Спільні дані гри (доступ до них - тільки під замком!) ====
+players = {}   # player_id -> обʼєкт Player
+food_items = [create_random_food() for _ in range(FOOD_COUNT)]
+
+state_lock = threading.Lock()          # захищає players і food_items
+next_player_id = 1
+next_player_id_lock = threading.Lock()  # захищає лічильник next_player_id
+
+
+
 
 def handle_client(conn, addr, player): 
     global state_lock, players
@@ -60,15 +118,7 @@ def send_json_line(sock, data):
         return True
     except OSError:
         return False        
-def create_random_food():
-    x = randint(-WORLD_SIZE, WORLD_SIZE)
-    y = randint(-WORLD_SIZE, WORLD_SIZE)
-    c1 = randint(0, 255)
-    c2 = randint(0, 255)
-    c3 = randint(0, 255)
-    color = (c1, c2, c3)
-    f = Food(x, y, FOOD_RADIUS, color)
-    return f
+
 
 food_items = []
 for i in range(FOOD_COUNT):
@@ -106,18 +156,5 @@ def playeris_touching(self, other_x, other_y, other_radius):
     return distance <= self.radius + other_radius
 
 
-class Food:
-    def __init__(self, x, y, radius, color):
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.color = color
-
-    def to_dict(self):
-
-        a = {"x": self.x,
-                "y": self.y,
-                "radius": self.radius,
-                "color": self.color}
-        
-        return a
+if __name__ == "__main__":
+    start_server()
