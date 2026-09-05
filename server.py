@@ -68,6 +68,9 @@ next_player_id = 1
 next_player_id_lock = threading.Lock()  # захищає лічильник next_player_id
 
 
+def move_all_players():
+    for player in players.values():
+        player.move()
 
 
 def handle_client(conn, addr, player): 
