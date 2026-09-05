@@ -145,6 +145,14 @@ def create_food_field():
         
    
         food_list.append(new_food)
+
+def playeris_touching(self, other_x, other_y, other_radius):
+
+    distance_x = self.x - self.orher_x
+    distance_y = self.y - self.orher_y
+    distance = hypot(distance_x, distance_y)
+
+    return distance <= self.radius + other_radius
         
  
     return food_list    
