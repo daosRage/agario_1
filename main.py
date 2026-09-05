@@ -30,6 +30,14 @@ class Food:
         self.radius = radius
         self.color = color
 
+    def playeris_touching(self, other_x, other_y, other_radius):
+
+        distance_x = self.x - other_x
+        distance_y = self.y - other_y
+        distance = hypot(distance_x, distance_y)
+
+        return distance <= self.radius + other_radius
+
 
 
 
@@ -57,39 +65,52 @@ def calculate_food_scale():
         a = threshold_radius / player_radius
         b = a ** zoom_out_speed
         return b  
-    def is_touching_player(self,  px, py, p_radius):
-
-        distance_x = self.x - px
-        distance_y = self.y - py
-        d = hypot(distance_x , distance_y)
-        
-        return d <= self.radius + p_radius
+    
 
 
 
 
 def eat_food():
-    
+    global player_radius
     eaten = []
     
     for food in food_items:
-        if food.check_collision(player_x, player_y, player_radius):
+        if food.playeris_touching(player_x, player_y, player_radius):
             eaten.append(food)         
             player_radius += 1          
             
     for food in eaten:
         food_items.remove(food)
         
-def move_player():
-    player = pygame.key.get_pressed()
+def move_player(player):
+    global player_x, player_y
     if player[pygame.K_UP]:
-        player.y -= PLAYER_SPEED
+        player_y -= PLAYER_SPEED
     if player[pygame.K_DOWN]:
-        player.y += PLAYER_SPEED
+        player_y += PLAYER_SPEED
     if player[pygame.K_LEFT]:
-        player.x -= PLAYER_SPEED
+        player_x -= PLAYER_SPEED
     if player[pygame.K_RIGHT]:
-        player.x += PLAYER_SPEED
+        player_x += PLAYER_SPEED
+
+def create_food_field():
+    food_list = []
+    
+    for _ in range(FOOD_COUNT):
+        x = randint(-WORLD_SIZE, WORLD_SIZE)
+        
+        y = randint(-WORLD_SIZE, WORLD_SIZE)
+        
+        color = (randint(0, 255), randint(0, 255), randint(0, 255))
+
+        new_food = Food(x, y, 10, color)
+        
+   
+        food_list.append(new_food)
+        
+ 
+    return food_list   
+food_items = create_food_field()
 
 def world_to_screen(x, y, scale):
     b_x = x - player_x
@@ -125,37 +146,8 @@ while running:
 
     keys = pygame.key.get_pressed()
 
-from pygame import*
-from random import*
 
-arta= food_items
-FOOD_COUNT = 1000
 
-def create_food_field():
-    food_list = []
-    
-    for _ in range(FOOD_COUNT):
-        x = randint(-WORLD_SIZE, WORLD_SIZE)
-        
-        y = randint(-WORLD_SIZE, WORLD_SIZE)
-        
-        color = (randint(0, 255), randint(0, 255), randint(0, 255))
-
-        new_food = Food(x, y, color)
-        
-   
-        food_list.append(new_food)
-
-def playeris_touching(self, other_x, other_y, other_radius):
-
-    distance_x = self.x - self.orher_x
-    distance_y = self.y - self.orher_y
-    distance = hypot(distance_x, distance_y)
-
-    return distance <= self.radius + other_radius
-        
- 
-    return food_list    
     move_player(keys)
     eat_food()
     draw_everything()
