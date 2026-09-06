@@ -12,7 +12,7 @@ FPS = 60              #скільки кадрів за секунду
 
 pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("З'їж кружечки!")
+pygame.display.set_caption("Agar.IO")
 clock = pygame.time.Clock()
 
 #Гравець
