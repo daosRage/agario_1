@@ -62,6 +62,19 @@ def handle_food_eating():
             food_items.remove(food)
             create_random_food()
 
+
+ def game_loop():
+     tick_duration = 1 / TICK_RATE
+
+     while True:
+         start_time = time()
+
+        broadcast_state_to_everyone()
+
+        elapsed = time() - start_time
+        sleep_time = max(0, tick_duration - elapsed)
+        sleep(sleep_time)
+
 class Player():
     def __init__(self,player_id,x,y,color,socket):
         self.player_id = player_id
