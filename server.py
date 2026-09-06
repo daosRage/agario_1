@@ -47,6 +47,21 @@ def create_random_food():
     return f
 
 
+def handle_food_eating():
+    global food_items
+
+    for player in players:
+        eaten_food = []
+
+        for food in food_items:
+            if player.is_touching(food):
+                eaten_food.append(food)
+                player.radius += food.radius * 0.2
+
+        for food in eaten_food:
+            food_items.remove(food)
+            create_random_food()
+
 class Player():
     def __init__(self,player_id,x,y,color,socket):
         self.player_id = player_id
