@@ -230,6 +230,33 @@ def playeris_touching(self, other_x, other_y, other_radius):
 
     return distance <= self.radius + other_radius
 
+def start_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
+    print()
+    threading.Thread(target=gameloop, daemon=True).start()
+    while True:
+        conn, addr = server_socket.accept()
+        with state_lock:
+            server_is_full = len(players) >= MAX_PLAYER
+        if server_is_full:
+            send_json_line(conn,{"error": "server_full"})
+            conn.close()
+            continue
+        player_id = get_next_player_id()
+        new_player = create_new_player(player_id, conn)
+        with state_lock:
+            players[player_id] = new_player
+
+        send_json_file(conn,{
+    "your_id": player_id
+})
+        print(f"")
+        threading.Thread(target=handle_client, args = (conn,addr,new_player),daemon=True).start()
+
+
 
 if __name__ == "__main__":
     start_server()
