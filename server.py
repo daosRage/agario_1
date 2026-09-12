@@ -167,6 +167,14 @@ def send_json_line(sock, data):
         return False        
 
 
+def get_next_player_id():
+    global next_player_id
+    with next_player_id_lock:
+        pid = next_player_id 
+        next_player_id = next_player_id + 1
+    return pid
+
+
 food_items = []
 for i in range(FOOD_COUNT):
     food_items.append(create_random_food())
