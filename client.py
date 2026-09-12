@@ -63,3 +63,7 @@ def keys():
     "s": keys[pygame.K_s],
     "d": keys[pygame.K_d]
 }
+def connect_to_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.connect(( SERVER_HOST, SERVER_PORT))
+    return server_socket
