@@ -174,6 +174,16 @@ def get_next_player_id():
         next_player_id = next_player_id + 1
     return pid
 
+def build_state_message():
+    vladick = {
+    "players": [players_spysok],
+    "food": [food_spysochok]
+}                   
+    players_spysok = [player.to_dict() for player in players]
+
+    food_spysochok = [food.to_dict() for food in food_items]
+
+    return vladick
 
 food_items = []
 for i in range(FOOD_COUNT):
