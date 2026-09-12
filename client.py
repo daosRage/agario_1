@@ -2,7 +2,18 @@
 
 
 
-
+def draw_players(window, font, player_list, camera_x, camera_y, camera_scale):
+    for player in player_list:
+        sx, sy = world_to_screen(player["x"], player["y"],camera_x, camera_y, camera_scale)
+        rad = int(player["radius"] * camera_scale)
+        if player["id"] == my_player_id:
+            pygame.draw.circle(window, (0, 255, 0), (sx, sy), rad)
+            textme = font.render(player["name"],True, (0, 255, 0))
+            window.blit(textme, (sx, sy + 3))
+        else:
+            pygame.draw.circle(window, tuple(player["color"]), (sx, sy), rad)
+            textme2 = font.render(player["name"],True, (0, 255, 0))
+            window.blit(textme2, (sx, sy + 3))
 
 def find_my_player(players_list):
     for player in players_list:
