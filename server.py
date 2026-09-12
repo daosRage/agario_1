@@ -165,7 +165,17 @@ def send_json_line(sock, data):
         return True
     except OSError:
         return False        
-
+def handle_player_vs_player():
+    all_players = list(players.values())
+    for i, first in enumerate(all_players):
+        for second in all_players[i + 1:]:
+            if first.is_touching(second.x, second.y, second.radius):
+                if first.is_enough_bigger_than(second):
+                    first.radius += int(second.radius / 2)
+                    second.respawn()
+                elif second.is_enough_bigger_than(first):
+                    second.radius += int(first.radius / 2)
+                    first.respawn()
 
 def get_next_player_id():
     global next_player_id
