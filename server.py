@@ -85,7 +85,23 @@ class Player():
         self.radius = START_PLAYER_RADIUS
         self.name = f"{player_id}"
         self.keys = {}
-
+    def is_enough_bigger_than(self, other_player):
+        EAT_SIZE_ADVANTAGE = 1.15
+        
+        current_radius = self.radius
+        
+        target_radius = other_player.radius
+        
+        required_size = target_radius * EAT_SIZE_ADVANTAGE
+        
+        is_bigger = current_radius > required_size
+        
+        return is_bigger
+    def respawn(self):
+        self.radius = START_PLAYER_RADIUS
+        self.x = randint( -WORLD_SIZE, WORLD_SIZE)
+        self.y = randint( -WORLD_SIZE, WORLD_SIZE)
+    
 
 # ==== Спільні дані гри (доступ до них - тільки під замком!) ====
 players = {}   # player_id -> обʼєкт Player
