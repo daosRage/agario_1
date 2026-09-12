@@ -32,3 +32,10 @@ def calculate_food_scale():
         a = threshold_radius / player_radius
         b = a ** zoom_out_speed
         return b  
+def keys():
+    return {
+    "w": keys[pygame.K_w],
+    "a": keys[pygame.K_a],
+    "s": keys[pygame.K_s],
+    "d": keys[pygame.K_d]
+}
