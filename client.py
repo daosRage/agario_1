@@ -4,7 +4,11 @@
 
 
 
-
+def find_my_player(players_list):
+    for player in players_list:
+        if player["id"] == my_player_id:
+            return player   
+    return None
 
 def calculate_camera_scale():
     comfortble_scale = 1.0
