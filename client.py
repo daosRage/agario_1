@@ -1,7 +1,16 @@
 
 
 
-
+def extract_complete_messages(messages, buffer):
+    messages = []
+    index = buffer.find("/n")
+    while index > -1:
+        index = buffer.find("/n")
+        line = buffer[:index]
+        messages.append(line)
+        buffer = buffer[index+1:]
+    return messages, buffer
+    
 def draw_players(window, font, player_list, camera_x, camera_y, camera_scale):
     for player in player_list:
         sx, sy = world_to_screen(player["x"], player["y"],camera_x, camera_y, camera_scale)
