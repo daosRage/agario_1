@@ -185,13 +185,13 @@ def get_next_player_id():
     return pid
 
 def build_state_message():
+    players_spysok = [player.to_dict() for player in players.values()]
+
+    food_spysochok = [food.to_dict() for food in food_items]
     vladick = {
     "players": [players_spysok],
     "food": [food_spysochok]
 }                   
-    players_spysok = [player.to_dict() for player in players]
-
-    food_spysochok = [food.to_dict() for food in food_items]
 
     return vladick
 
