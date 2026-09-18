@@ -49,6 +49,17 @@ def calculate_food_scale():
     threshold_radius = 100
     zoom_out_speed = 0.15
 
+def draw_food(window, food_list, camera_x, camera_y, camera_scale, food_scale):
+    for food in food_list:
+        sx, sy = world_to_screen(food["x"], food["y"], camera_x, camera_y, camera_scale)
+        
+        scaled_radius = food["radius"] * food_scale
+        if scaled_radius < 1:
+            scaled_radius = 1
+            
+        pygame.draw.circle(window, food["color"], (int(sx), int(sy)), int(scaled_radius))
+
+
     if player_radius <= threshold_radius:
         return comfortble_scale
 
