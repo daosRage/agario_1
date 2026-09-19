@@ -124,15 +124,16 @@ def world_to_screen(x, y, scale):
     return screen_x, screen_y
     
 def draw_everything():
-    window.fill("white")
+    window.fill("White")
+    
     camera_scale = calculate_camera_scale()
     food_scale = calculate_food_scale()
+    
     for food in food_items:
-        sx,sy = world_to_screen(food.x,food.y,camera_scale)
-        scaled_radius = max(1,int(food.radius * food_scale))
-        pygame.draw.circle(window,food.color,(sx,sy),scaled_radius)
-    scaled_player_radius = int(player_radius * camera_scale)
-    pygame.draw.circle(window,player_color,(WIDTH // 2,HEIGHT // 2),scaled_player_radius)
+        sx, sy = world_to_screen(food.x, food.y)
+        screen_radius = int(food.radius * food_scale * camera_scale)
+        pygame.draw.circle(window, food.color, (int(sx), int(sy)), screen_radius)
+
 
 
 
