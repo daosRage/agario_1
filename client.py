@@ -27,7 +27,7 @@ def send_json_line(sock, data):
     except OSError:
         return False   
         
-def extract_complete_messages(messages, buffer):
+def extract_complete_messages(buffer):
     messages = []
     index = buffer.find("/n")
     while index > -1:
@@ -69,7 +69,7 @@ def receive_messages(sock):
                     latest_state = data_dict
 
     with state_lock:
-        connected = Falsе
+        connected = False
     print("звязок розірвано")
 
 
@@ -79,12 +79,12 @@ def connect_to_server():
     server_socket.connect(( SERVER_HOST, SERVER_PORT))
     return server_socket
 
-def get_pressed_keys_dict():
+def get_pressed_keys_dict(keys):
     return {
-    "w": keys[pygame.K_w],
-    "a": keys[pygame.K_a],
-    "s": keys[pygame.K_s],
-    "d": keys[pygame.K_d]
+    "w": bool(keys[pygame.K_w]),
+    "a": bool(keys[pygame.K_a]),
+    "s": bool(keys[pygame.K_s]),
+    "d": bool(keys[pygame.K_d])
 }
 
 def calculate_camera_scale(player_radius):
@@ -144,6 +144,7 @@ def draw_players(window, font, player_list, camera_x, camera_y, camera_scale):
         sx, sy = world_to_screen(player["x"], player["y"],camera_x, camera_y, camera_scale)
         rad = int(player["radius"] * camera_scale)
         if player["id"] == my_player_id:
+            print(1)
             pygame.draw.circle(window, (0, 255, 0), (sx, sy), rad)
             textme = font.render(player["name"],True, (0, 255, 0))
             window.blit(textme, (sx, sy + 3))
@@ -163,15 +164,18 @@ def draw_players(window, font, player_list, camera_x, camera_y, camera_scale):
 
 
 def draw_everything(window, font, state):
-    window.fill("white")
+    print(111)
+    window.fill((255,255,255))
     my_player = find_my_player(state["players"])
     if my_player is None:
         pygame.display.update()
         return
     camera_x = my_player["x"]
     camera_y = my_player["y"]
+    print(111)
     camera_scale = calculate_camera_scale(my_player["radius"])
     food_scale = calculate_food_scale(my_player["radius"])
+    print(3)
     draw_food(window, state["food"], camera_x, camera_y, camera_scale, food_scale)
     draw_players(window, font, state["players"], camera_x, camera_y, camera_scale)
     pygame.display.update()
@@ -186,7 +190,7 @@ def main():
     except OSError as error:
         print("Не вдалося підключитись до сервера:", error)
         return
-
+    print(2)
     threading.Thread(target=receive_messages, args=(sock,), daemon=True).start()
 
     pygame.init()
@@ -210,7 +214,7 @@ def main():
                 "players": list(latest_state["players"]),
                 "food": list(latest_state["food"]),
             }
-
+        print(222)
         draw_everything(window, font, state_copy)
         clock.tick(FPS)
 
@@ -222,4 +226,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print(1)
     main()
