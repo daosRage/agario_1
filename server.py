@@ -47,20 +47,7 @@ def create_random_food():
     return f
 
 
-def handle_food_eating():
-    global food_items
 
-    for player in players:
-        eaten_food = []
-
-        for food in food_items:
-            if player.is_touching(food):
-                eaten_food.append(food)
-                player.radius += food.radius * 0.2
-
-        for food in eaten_food:
-            food_items.remove(food)
-            create_random_food()
 
 
 
@@ -77,15 +64,15 @@ class Player():
         self.keys = {}
 
     
-    def move_player(self):
-    if self.keys.get("w"):
-        self.y -= PLAYER_SPEED
-    if self.keys.get("s"):
-        self.y += PLAYER_SPEED
-    if self.keys.get("a"):
-        self.x -= PLAYER_SPEED
-    if self.keys.get("d"):
-        self.x += PLAYER_SPEED
+    def move(self):
+        if self.keys.get("w"):
+            self.y -= PLAYER_SPEED
+        if self.keys.get("s"):
+            self.y += PLAYER_SPEED
+        if self.keys.get("a"):
+            self.x -= PLAYER_SPEED
+        if self.keys.get("d"):
+            self.x += PLAYER_SPEED
 
     
     def is_touching(self, other_x, other_y, other_radius):
@@ -127,10 +114,24 @@ next_player_id = 1
 next_player_id_lock = threading.Lock()  # захищає лічильник next_player_id
 
 
-def move_all_players():
-    for player in players.values():
-        player.move()
+def send_json_line(sock, data):
+    try:
+        text = json.dumps(data)
+        message = text + "\n"
+        sock.sendall(message.encode("utf-8"))
+        return True
+    except OSError:
+        return False   
 
+def extract_complete_messages(messages, buffer):
+    messages = []
+    index = buffer.find("/n")
+    while index > -1:
+        index = buffer.find("/n")
+        line = buffer[:index]
+        messages.append(line)
+        buffer = buffer[index+1:]
+    return messages, buffer
 
 def handle_client(conn, addr, player): 
     global state_lock, players
@@ -172,14 +173,26 @@ def handle_client(conn, addr, player):
         conn.close()
         print(f"Player {player.id} disconnected")
         
-def send_json_line(sock, data):
-    try:
-        text = json.dumps(data)
-        message = text + "\n"
-        sock.sendall(message.encode("utf-8"))
-        return True
-    except OSError:
-        return False        
+def move_all_players():
+    for player in players.values():
+        player.move()
+
+
+def handle_food_eating():
+    global food_items
+
+    for player in players:
+        eaten_food = []
+
+        for food in food_items:
+            if player.is_touching(food):
+                eaten_food.append(food)
+                player.radius += food.radius * 0.2
+
+        for food in eaten_food:
+            food_items.remove(food)
+            create_random_food()
+
 def handle_player_vs_player():
     all_players = list(players.values())
     for i, first in enumerate(all_players):
@@ -192,6 +205,17 @@ def handle_player_vs_player():
                     second.radius += int(first.radius / 2)
                     first.respawn()
 
+def build_state_message():
+    players_spysok = [player.to_dict() for player in players.values()]
+
+    food_spysochok = [food.to_dict() for food in food_items]
+    vladick = {
+    "players": players_spysok,
+    "food": food_spysochok
+}                   
+
+    return vladick
+
 def get_next_player_id():
     global next_player_id
     with next_player_id_lock:
@@ -199,16 +223,7 @@ def get_next_player_id():
         next_player_id = next_player_id + 1
     return pid
 
-def build_state_message():
-    players_spysok = [player.to_dict() for player in players.values()]
 
-    food_spysochok = [food.to_dict() for food in food_items]
-    vladick = {
-    "players": [players_spysok],
-    "food": [food_spysochok]
-}                   
-
-    return vladick
 
 food_items = []
 for i in range(FOOD_COUNT):
@@ -217,15 +232,7 @@ for i in range(FOOD_COUNT):
 
 
 
-def extract_complete_messages(messages, buffer):
-    messages = []
-    index = buffer.find("/n")
-    while index > -1:
-        index = buffer.find("/n")
-        line = buffer[:index]
-        messages.append(line)
-        buffer = buffer[index+1:]
-    return messages, buffer
+
 
 
 
