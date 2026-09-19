@@ -45,39 +45,32 @@ def receive_messages(sock):
     while connected:
         try:
             data = sock.recv(4096)
-            if not data:
-                break
         except OSError:
             break
-
+        if not data:
+                break
+        buffer += data.decode("utf-8")
         messages, buffer = extract_complete_messages(buffer)
 
         for message_text in messages:
             try:
                 data_dict = json.loads(message_text)
-            except (json.JSONDecodeError, TypeError):
+            except json.JSONDecodeError:
                 continue
 
-            if type(data_dict) is not dict:
-                continue
-
-            if "error" in data_dict:
-                print(f"Помилка: {data_dict['error']}")
-                with state_lock:
-                    connected = False
-                break
-
-            if "your_id" in data_dict:
-                with state_lock:
+            with state_lock:
+                if "your_id" in data_dict:
+                
                     my_player_id = data_dict["your_id"]
-
-            if "players" in data_dict:
-                with state_lock:
+                if "error" in data_dict:
+                    print(f"Помилка: {data_dict['error']}")
+                    connected = False
+                if "players" in data_dict:
                     latest_state = data_dict
 
-
+    with state_lock:
         connected = Falsе
-
+    print("звязок розірвано")
 
 
 
@@ -132,8 +125,20 @@ def world_to_screen(x, y, camera_x, camera_y, scale):
     screen_y = h_y + halfy
     return screen_x, screen_y
     
+def find_my_player(players_list):
+    for player in players_list:
+        if player["id"] == my_player_id:
+            return player   
+    return None
 
-    
+
+def draw_food(window, food_list, camera_x, camera_y, camera_scale, food_scale):
+    for food in food_list:
+        sx, sy = world_to_screen(food["x"], food["y"], camera_x, camera_y, camera_scale)
+        scaled_radius = max(1, int(food["radius"] * food_scale))
+        pygame.draw.circle(window, food["color"], (sx, sy), scaled_radius)
+
+
 def draw_players(window, font, player_list, camera_x, camera_y, camera_scale):
     for player in player_list:
         sx, sy = world_to_screen(player["x"], player["y"],camera_x, camera_y, camera_scale)
@@ -147,23 +152,11 @@ def draw_players(window, font, player_list, camera_x, camera_y, camera_scale):
             textme2 = font.render(player["name"],True, (0, 255, 0))
             window.blit(textme2, (sx, sy + 3))
 
-def find_my_player(players_list):
-    for player in players_list:
-        if player["id"] == my_player_id:
-            return player   
-    return None
 
 
 
-def draw_food(window, food_list, camera_x, camera_y, camera_scale, food_scale):
-    for food in food_list:
-        sx, sy = world_to_screen(food["x"], food["y"], camera_x, camera_y, camera_scale)
-        
-        scaled_radius = food["radius"] * food_scale
-        if scaled_radius < 1:
-            scaled_radius = 1
-            
-        pygame.draw.circle(window, food["color"], (int(sx), int(sy)), int(scaled_radius))
+
+
 
 
 
@@ -171,9 +164,8 @@ def draw_food(window, food_list, camera_x, camera_y, camera_scale, food_scale):
 
 def draw_everything(window, font, state):
     window.fill("white")
-    find_my_player(state["player"])
     my_player = find_my_player(state["players"])
-    if my_player == None:
+    if my_player is None:
         pygame.display.update()
         return
     camera_x = my_player["x"]
@@ -185,7 +177,46 @@ def draw_everything(window, font, state):
     pygame.display.update()
 
 
+def main():
+    global connected
 
+    print(f"Підключаюсь до сервера {SERVER_HOST}:{SERVER_PORT}...")
+    try:
+        sock = connect_to_server()
+    except OSError as error:
+        print("Не вдалося підключитись до сервера:", error)
+        return
+
+    threading.Thread(target=receive_messages, args=(sock,), daemon=True).start()
+
+    pygame.init()
+    window = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("З'їж кружечки! (онлайн)")
+    clock = pygame.time.Clock()
+    font = pygame.font.Font(None, 24)
+
+    running = True
+    while running and connected:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        keys = pygame.key.get_pressed()
+        keys_dict = get_pressed_keys_dict(keys)
+        send_json_line(sock, {"keys": keys_dict})
+
+        with state_lock:
+            state_copy = {
+                "players": list(latest_state["players"]),
+                "food": list(latest_state["food"]),
+            }
+
+        draw_everything(window, font, state_copy)
+        clock.tick(FPS)
+
+    connected = False
+    sock.close()
+    pygame.quit()
 
 
 
