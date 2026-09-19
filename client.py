@@ -18,6 +18,26 @@ my_player_id = None                           # який саме гравець
 connected = True                              # чи ще тримаємо звʼязок із сервером
 state_lock = threading.Lock()                 # захищає всі змінні вище від одночасного доступу
 
+
+def extract_complete_messages(messages, buffer):
+    messages = []
+    index = buffer.find("/n")
+    while index > -1:
+        index = buffer.find("/n")
+        line = buffer[:index]
+        messages.append(line)
+        buffer = buffer[index+1:]
+    return messages, buffer
+
+
+
+
+
+def connect_to_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.connect(( SERVER_HOST, SERVER_PORT))
+    return server_socket
+
 def world_to_screen(x, y, camera_x, camera_y, scale):
     b_x = x - camera_x
     b_y = y - camera_y
@@ -29,15 +49,7 @@ def world_to_screen(x, y, camera_x, camera_y, scale):
     screen_y = h_y + halfy
     return screen_x, screen_y
     
-def extract_complete_messages(messages, buffer):
-    messages = []
-    index = buffer.find("/n")
-    while index > -1:
-        index = buffer.find("/n")
-        line = buffer[:index]
-        messages.append(line)
-        buffer = buffer[index+1:]
-    return messages, buffer
+
     
 def draw_players(window, font, player_list, camera_x, camera_y, camera_scale):
     for player in player_list:
@@ -119,10 +131,7 @@ def draw_everything(window, font, state):
     pygame.display.update()
 
 
-def connect_to_server():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.connect(( SERVER_HOST, SERVER_PORT))
-    return server_socket
+
 
 
 
