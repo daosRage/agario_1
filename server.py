@@ -216,6 +216,27 @@ def build_state_message():
 
     return vladick
 
+
+def broadcast_state_to_everyone():
+    with state_lock:
+        move_all_players()
+        handle_food_eating()
+        handle_player_vs_player()
+
+        state_message = build_state_message()
+
+        players_to_notify = [
+            (player.sock, player_id) 
+            for player_id, player in players.items()
+        ]
+
+    for sock, player_id in players_to_notify:
+        success = send_json_line(sock, state_message)
+
+        if not success:
+            with state_lock:
+                if player_id in players:
+                    del players[player_id]
 def get_next_player_id():
     global next_player_id
     with next_player_id_lock:
