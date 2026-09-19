@@ -77,8 +77,8 @@ class Player():
     
     def is_touching(self, other_x, other_y, other_radius):
 
-        distance_x = self.x - self.orher_x
-        distance_y = self.y - self.orher_y
+        distance_x = self.x - other_x
+        distance_y = self.y - other_y
         distance = hypot(distance_x, distance_y)
 
         return distance <= self.radius + other_radius
@@ -123,7 +123,7 @@ def send_json_line(sock, data):
     except OSError:
         return False   
 
-def extract_complete_messages(messages, buffer):
+def extract_complete_messages(buffer):
     messages = []
     index = buffer.find("/n")
     while index > -1:
@@ -168,30 +168,33 @@ def handle_client(conn, addr, player):
                 break
     finally:
         with state_lock:
-            players.pop(player.id, None)
+            players.pop(player.player_id, None)
 
         conn.close()
-        print(f"Player {player.id} disconnected")
+        print(f"Player {player.player_id} disconnected")
         
 def move_all_players():
     for player in players.values():
         player.move()
 
 
+
 def handle_food_eating():
     global food_items
 
-    for player in players:
+
+    for player in players.values():
         eaten_food = []
 
         for food in food_items:
-            if player.is_touching(food):
+            if player.is_touching(food.x, food.y, food.radius):
                 eaten_food.append(food)
                 player.radius += food.radius * 0.2
 
         for food in eaten_food:
             food_items.remove(food)
             create_random_food()
+
 
 def handle_player_vs_player():
     all_players = list(players.values())
@@ -241,8 +244,7 @@ def game_loop():
      tick_duration = 1 / TICK_RATE
 
      while True:
-         start_time = time()
-
+        start_time = time()
         broadcast_state_to_everyone()
 
         elapsed = time() - start_time
@@ -250,9 +252,9 @@ def game_loop():
         sleep(sleep_time)
 
 def create_new_player(player_id , sock):
-    x = random.randint(-WORLD_SIZE,WORLD_SIZE)
-    y = random.randint(-WORLD_SIZE,WORLD_SIZE)
-    color = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))   
+    x = randint(-WORLD_SIZE,WORLD_SIZE)
+    y = randint(-WORLD_SIZE,WORLD_SIZE)
+    color = (randint(0, 255),randint(0, 255),randint(0, 255))   
     return Player(player_id,x,y,color,sock)
     
 
@@ -281,12 +283,11 @@ def start_server():
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
     server_socket.bind((HOST, PORT))
     server_socket.listen()
-    print()
-    threading.Thread(target=gameloop, daemon=True).start()
+    threading.Thread(target=game_loop, daemon=True).start()
     while True:
         conn, addr = server_socket.accept()
         with state_lock:
-            server_is_full = len(players) >= MAX_PLAYER
+            server_is_full = len(players) >= MAX_PLAYERS
         if server_is_full:
             send_json_line(conn,{"error": "server_full"})
             conn.close()
@@ -296,7 +297,7 @@ def start_server():
         with state_lock:
             players[player_id] = new_player
 
-        send_json_file(conn,{
+        send_json_line(conn,{
     "your_id": player_id
 })
         print(f"")
