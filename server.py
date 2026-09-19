@@ -63,17 +63,7 @@ def handle_food_eating():
             create_random_food()
 
 
- def game_loop():
-     tick_duration = 1 / TICK_RATE
 
-     while True:
-         start_time = time()
-
-        broadcast_state_to_everyone()
-
-        elapsed = time() - start_time
-        sleep_time = max(0, tick_duration - elapsed)
-        sleep(sleep_time)
 
 class Player():
     def __init__(self,player_id,x,y,color,socket):
@@ -85,15 +75,19 @@ class Player():
         self.radius = START_PLAYER_RADIUS
         self.name = f"{player_id}"
         self.keys = {}
+
+    def is_touching(self, other_x, other_y, other_radius):
+
+        distance_x = self.x - self.orher_x
+        distance_y = self.y - self.orher_y
+        distance = hypot(distance_x, distance_y)
+
+        return distance <= self.radius + other_radius
     def is_enough_bigger_than(self, other_player):
         EAT_SIZE_ADVANTAGE = 1.15
-        
         current_radius = self.radius
-        
         target_radius = other_player.radius
-        
         required_size = target_radius * EAT_SIZE_ADVANTAGE
-        
         is_bigger = current_radius > required_size
         
         return is_bigger
@@ -101,7 +95,16 @@ class Player():
         self.radius = START_PLAYER_RADIUS
         self.x = randint( -WORLD_SIZE, WORLD_SIZE)
         self.y = randint( -WORLD_SIZE, WORLD_SIZE)
-    
+    def to_dict(self):
+        player = {
+        "id": self.player_id,
+        "x": self.x,
+        "y": self.y,
+        "radius": self.radius,
+        "color": self.color,
+        "name": self.name,
+        }
+        return player
 
 # ==== Спільні дані гри (доступ до них - тільки під замком!) ====
 players = {}   # player_id -> обʼєкт Player
@@ -199,17 +202,7 @@ food_items = []
 for i in range(FOOD_COUNT):
     food_items.append(create_random_food())
     
-def to_dict(self):
-    player = {
-    "id": self.player_id,
-    "x": self.x,
-    "y": self.y,
-    "radius": self.radius,
-    "color": self.color,
-    "name": self.name,
-    
-    }
-    return player
+
 
 
 def extract_complete_messages(messages, buffer):
@@ -222,13 +215,7 @@ def extract_complete_messages(messages, buffer):
         buffer = buffer[index+1:]
     return messages, buffer
 
-def playeris_touching(self, other_x, other_y, other_radius):
 
-    distance_x = self.x - self.orher_x
-    distance_y = self.y - self.orher_y
-    distance = hypot(distance_x, distance_y)
-
-    return distance <= self.radius + other_radius
 
 def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -255,7 +242,17 @@ def start_server():
 })
         print(f"")
         threading.Thread(target=handle_client, args = (conn,addr,new_player),daemon=True).start()
+ def game_loop():
+     tick_duration = 1 / TICK_RATE
 
+     while True:
+         start_time = time()
+
+        broadcast_state_to_everyone()
+
+        elapsed = time() - start_time
+        sleep_time = max(0, tick_duration - elapsed)
+        sleep(sleep_time)
 
 
 if __name__ == "__main__":
