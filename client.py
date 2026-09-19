@@ -1,4 +1,22 @@
+import socket
+import threading
+import json
+import pygame
 
+#До якого сервера підключатись ====
+SERVER_HOST = "localhost"   # "127.0.0.1" означає "цей самий компʼютер"
+SERVER_PORT = 5555
+
+#Налаштування вікна ====
+WIDTH = 1000
+HEIGHT = 1000
+FPS = 60
+
+#Спільні дані, якими користуються ОБИДВА потоки ====
+latest_state = {"players": [], "food": []}   # останній стан гри, надісланий сервером
+my_player_id = None                           # який саме гравець у latest_state - це "я"
+connected = True                              # чи ще тримаємо звʼязок із сервером
+state_lock = threading.Lock()                 # захищає всі змінні вище від одночасного доступу
 
 
 def extract_complete_messages(messages, buffer):
@@ -78,3 +96,9 @@ def connect_to_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.connect(( SERVER_HOST, SERVER_PORT))
     return server_socket
+
+
+
+
+if __name__ == "__main__":
+    main()
