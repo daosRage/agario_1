@@ -249,6 +249,13 @@ def game_loop():
         sleep_time = max(0, tick_duration - elapsed)
         sleep(sleep_time)
 
+def create_new_player(player_id , sock):
+    x = random.randint(-WORLD_SIZE,WORLD_SIZE)
+    y = random.randint(-WORLD_SIZE,WORLD_SIZE)
+    color = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))   
+    return Player(player_id,x,y,color,sock)
+    
+
 def get_next_player_id():
     global next_player_id
     with next_player_id_lock:
