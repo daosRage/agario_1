@@ -46,6 +46,41 @@ def connect_to_server():
     server_socket.connect(( SERVER_HOST, SERVER_PORT))
     return server_socket
 
+def get_pressed_keys_dict():
+    return {
+    "w": keys[pygame.K_w],
+    "a": keys[pygame.K_a],
+    "s": keys[pygame.K_s],
+    "d": keys[pygame.K_d]
+}
+
+def calculate_camera_scale(player_radius):
+    comfortble_scale = 1.0
+    threshold_radius = 100
+    zoom_out_speed = 0.8
+
+    if player_radius <= threshold_radius:
+        return comfortble_scale
+
+    else:
+        a = threshold_radius / player_radius
+        b = a ** zoom_out_speed
+        return b 
+
+
+def calculate_food_scale(player_radius):
+    comfortble_scale = 1.0
+    threshold_radius = 100
+    zoom_out_speed = 0.15
+    if player_radius <= threshold_radius:
+        return comfortble_scale
+
+    else:
+        a = threshold_radius / player_radius
+        b = a ** zoom_out_speed
+        return b  
+
+
 def world_to_screen(x, y, camera_x, camera_y, scale):
     b_x = x - camera_x
     b_y = y - camera_y
@@ -78,24 +113,7 @@ def find_my_player(players_list):
             return player   
     return None
 
-def calculate_camera_scale():
-    comfortble_scale = 1.0
-    threshold_radius = 100
-    zoom_out_speed = 0.8
 
-    if player_radius <= threshold_radius:
-        return comfortble_scale
-
-    else:
-        a = threshold_radius / player_radius
-        b = a ** zoom_out_speed
-        return b 
-
-
-def calculate_food_scale():
-    comfortble_scale = 1.0
-    threshold_radius = 100
-    zoom_out_speed = 0.15
 
 def draw_food(window, food_list, camera_x, camera_y, camera_scale, food_scale):
     for food in food_list:
@@ -108,20 +126,8 @@ def draw_food(window, food_list, camera_x, camera_y, camera_scale, food_scale):
         pygame.draw.circle(window, food["color"], (int(sx), int(sy)), int(scaled_radius))
 
 
-    if player_radius <= threshold_radius:
-        return comfortble_scale
 
-    else:
-        a = threshold_radius / player_radius
-        b = a ** zoom_out_speed
-        return b  
-def keys():
-    return {
-    "w": keys[pygame.K_w],
-    "a": keys[pygame.K_a],
-    "s": keys[pygame.K_s],
-    "d": keys[pygame.K_d]
-}
+
 
 def draw_everything(window, font, state):
     window.fill("white")
