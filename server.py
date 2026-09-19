@@ -76,6 +76,18 @@ class Player():
         self.name = f"{player_id}"
         self.keys = {}
 
+    
+    def move_player(self):
+    if self.keys.get("w"):
+        self.y -= PLAYER_SPEED
+    if self.keys.get("s"):
+        self.y += PLAYER_SPEED
+    if self.keys.get("a"):
+        self.x -= PLAYER_SPEED
+    if self.keys.get("d"):
+        self.x += PLAYER_SPEED
+
+    
     def is_touching(self, other_x, other_y, other_radius):
 
         distance_x = self.x - self.orher_x
