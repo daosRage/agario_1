@@ -226,8 +226,8 @@ def broadcast_state_to_everyone():
         state_message = build_state_message()
 
         players_to_notify = [
-            (player.sock, player_id) 
-            for player_id, player in players.items()
+            (p.socket, p.player_id) 
+            for p in players.values()
         ]
 
     for sock, player_id in players_to_notify:
@@ -235,8 +235,20 @@ def broadcast_state_to_everyone():
 
         if not success:
             with state_lock:
-                if player_id in players:
-                    del players[player_id]
+                players.pop(player_id, None)
+
+def game_loop():
+     tick_duration = 1 / TICK_RATE
+
+     while True:
+         start_time = time()
+
+        broadcast_state_to_everyone()
+
+        elapsed = time() - start_time
+        sleep_time = max(0, tick_duration - elapsed)
+        sleep(sleep_time)
+
 def get_next_player_id():
     global next_player_id
     with next_player_id_lock:
@@ -282,17 +294,7 @@ def start_server():
 })
         print(f"")
         threading.Thread(target=handle_client, args = (conn,addr,new_player),daemon=True).start()
- def game_loop():
-     tick_duration = 1 / TICK_RATE
-
-     while True:
-         start_time = time()
-
-        broadcast_state_to_everyone()
-
-        elapsed = time() - start_time
-        sleep_time = max(0, tick_duration - elapsed)
-        sleep(sleep_time)
+ 
 
 
 if __name__ == "__main__":
