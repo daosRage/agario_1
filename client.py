@@ -18,7 +18,15 @@ my_player_id = None                           # який саме гравець
 connected = True                              # чи ще тримаємо звʼязок із сервером
 state_lock = threading.Lock()                 # захищає всі змінні вище від одночасного доступу
 
-
+def send_json_line(sock, data):
+    text = json.dumps(data)
+    message = text + "\n"
+    try:
+        sock.sendall(message.encode("utf-8"))
+        return True
+    except OSError:
+        return False   
+        
 def extract_complete_messages(messages, buffer):
     messages = []
     index = buffer.find("/n")
