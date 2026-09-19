@@ -18,7 +18,17 @@ my_player_id = None                           # який саме гравець
 connected = True                              # чи ще тримаємо звʼязок із сервером
 state_lock = threading.Lock()                 # захищає всі змінні вище від одночасного доступу
 
-
+def world_to_screen(x, y, camera_x, camera_y, scale):
+    b_x = x - camera_x
+    b_y = y - camera_y
+    h_x = b_x * scale
+    h_y = b_y * scale
+    halfx = WIDTH // 2
+    halfy = HEIGHT // 2
+    screen_x = h_x + halfx
+    screen_y = h_y + halfy
+    return screen_x, screen_y
+    
 def extract_complete_messages(messages, buffer):
     messages = []
     index = buffer.find("/n")
