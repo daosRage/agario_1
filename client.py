@@ -102,6 +102,23 @@ def keys():
     "s": keys[pygame.K_s],
     "d": keys[pygame.K_d]
 }
+
+def draw_everything(window, font, state):
+    window.fill("white")
+    find_my_player(state["player"])
+    my_player = find_my_player(state["players"])
+    if my_player == None:
+        pygame.display.update()
+        return
+    camera_x = my_player["x"]
+    camera_y = my_player["y"]
+    camera_scale = calculate_camera_scale(my_player["radius"])
+    food_scale = calculate_food_scale(my_player["radius"])
+    draw_food(window, state["food"], camera_x, camera_y, camera_scale, food_scale)
+    draw_players(window, font, state["players"], camera_x, camera_y, camera_scale)
+    pygame.display.update()
+
+
 def connect_to_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.connect(( SERVER_HOST, SERVER_PORT))
