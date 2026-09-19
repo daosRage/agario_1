@@ -37,6 +37,46 @@ def extract_complete_messages(messages, buffer):
         buffer = buffer[index+1:]
     return messages, buffer
 
+def receive_messages(sock):
+    global my_player_id, connected, latest_state
+    buffer = ""
+    connected = True
+
+    while connected:
+        try:
+            data = sock.recv(4096)
+            if not data:
+                break
+        except OSError:
+            break
+
+        messages, buffer = extract_complete_messages(buffer)
+
+        for message_text in messages:
+            try:
+                data_dict = json.loads(message_text)
+            except (json.JSONDecodeError, TypeError):
+                continue
+
+            if type(data_dict) is not dict:
+                continue
+
+            if "error" in data_dict:
+                print(f"Помилка: {data_dict['error']}")
+                with state_lock:
+                    connected = False
+                break
+
+            if "your_id" in data_dict:
+                with state_lock:
+                    my_player_id = data_dict["your_id"]
+
+            if "players" in data_dict:
+                with state_lock:
+                    latest_state = data_dict
+
+
+        connected = Falsе
 
 
 
